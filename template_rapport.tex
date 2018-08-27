@@ -1,0 +1,176 @@
+\documentclass[13pt,twoside,bibliography=totocnumbered]{scrreprt}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage[french]{babel, varioref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{stackengine}[2013-10-15]
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{calc}
+\usepackage{listingsutf8}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{afterpage}
+\usepackage[style=numeric,backend=bibtex]{biblatex}
+\usepackage{url}
+\usepackage[top=2.1cm,bottom=2.2cm,left=2cm,right=2cm]{geometry}
+\usepackage[final]{pdfpages}
+\usepackage[xindy, toc, numberedsection]{glossaries}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{datetime}
+% source code
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+
+%% New commands
+
+\newcommand{\med}{\emph{mediarithmics} }
+\newcommand{\bo}{\emph{bid optimizer} }
+
+\renewcommand{\baselinestretch}{1.25}
+
+\lstset{frame=tb,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+% Pour clickable summary
+\usepackage{hyperref} % Créer des liens et des signets
+\hypersetup{
+colorlinks=true, %colorise les liens
+breaklinks=true, %permet le retour à la ligne dans les liens trop longs
+urlcolor= blue, %couleur des hyperliens
+linkcolor= black, %couleur des liens internes
+citecolor=black,  %couleur des références
+}
+
+% Fichier de bibliographie
+\bibliography{parties/biblio}
+
+% Fichier de glossaire
+\input{glossaire}
+\makeglossaries
+
+\usepackage{templateINSA}
+\initINSA
+
+% Tirte centre
+\renewcommand\infoBig{Alexis \\ Durieux}
+\renewcommand\infoSmall{Rapport de stage}
+
+% Titre bas
+\title{Mars - Août 2018}
+\renewcommand\soustitre{mediarithmics}
+
+% Auteurs
+\author{
+	\\
+	\textbf{Étudiant :} Alexis \bsc{Durieux} \\
+	\textbf{Superviseur :} Stéphane \bsc{Dugelay} \\
+	\textbf{Entreprise :} mediarithmics\\
+	\textbf{Dates :} 05/03/2018 -- 31/08/2018 \\
+	\textbf{Location :} Paris, France \\
+	}
+
+\providecommand{\tightlist}{%
+	\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\begin{document}
+
+% titleINSA : Page de garde
+% #1 : descendre le titre du milieu (en mm)
+% #2 : lien de l'image de fond
+% #3 : décalage sur X de l'image de fond (en mm)
+% #4 : décalage sur Y de l'image de fond (en mm)
+% #5 : largeur de l'image de fond de #5 (en mm)
+% #6 : décalage sur X du logo de l'entreprise (en mm)
+% #7 : décalage sur Y du logo de l'entreprise (en mm)
+% #8 : taille du logo
+% #9 : lien du logo
+\titleINSA{5}{images/fond.png}{-0}{150}{250}{100}{15}{0.5}{images/logo-mediarithmics.png}
+
+\newpage
+\strut
+\newpage
+
+% Remerciements
+\input{parties/00-Remerciements.tex}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+\newpage
+\strut
+\newpage
+
+% Sommaire
+%\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table des matières}
+
+\newpage
+\strut
+\newpage
+
+% Parties
+\chapter*{Introduction}
+\input{parties/Introduction.tex}
+
+\chapter{Présentation de l'entreprise}
+\input{parties/01-PresentationEntreprise.tex}
+
+\chapter{Travail effectué} \label{accomplished_work}
+\input{parties/03-TravailEffectue.tex}
+
+\chapter{Conclusion}
+\input{parties/04-Conclusion.tex}
+
+\newpage
+\strut
+\newpage
+
+% Bibliographie
+\nocite{*}
+\clearpage
+\newpage
+\appendix
+\addtocontents{toc}{\vspace{0.5cm}}
+\printbibliography[title=Bibliography]
+
+% Glossaire
+\printglossaries
+
+% Annexes
+\clearpage
+\chapter{Annexes}
+\input{parties/10-Appendices.tex}
+
+% pageQuatriemeCouverture
+% #1 : Direction
+% #2 : telephone
+% #3 : e-mail
+% #4 : Resume Haut
+% #5 : Resume Bas
+\pageQuatriemeCouverture{Département ASI}{02 32 95 97 79}{asi@insa-rouen.fr}{\input{parties/ResumeFrancais.tex}}{\input{parties/ResumeAnglais.tex}}
+\addcontentsline{toc}{chapter}{Résumé -- Abstract}
+
+
+
+\end{document}
+\grid
