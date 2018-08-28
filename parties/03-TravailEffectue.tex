@@ -104,17 +104,19 @@ L'apprentissage d'un modèle consiste en une succession d'exécutions de scripts
         \end{figure}
         On peut voir sur cette figure que l'on obtient une courbe d'apprentissage standard résultant d'une descente de gradient. Plusieurs points éveillent toutefois l'attention. Le premier est le bruit du coût d'apprentissage. Ce dernier s'explique simplement. A la différence du jeu de données de test qui est fixe, le jeu de données d'apprentissage change à chaque \emph{batch}. Or le coût d'apprentissage représenté sur le graphe correspond au coût moyen du \emph{batch}. Il est donc cohérent d'obtenir un signal bruité. Le deuxième point qui mérite notre attention sont les deux chutes de performances lors du \emph{batch} $70$ et $110$. Il convient de comprendre l'origine de ces deux évènements, afin de s'assurer de la stabilité de l'apprentissage. J'ai par conséquent développé des scripts permettant d'obtenir des statistiques descriptives sur les données. J'ai ainsi pu, pour chacun des \emph{features}, représenter un diagramme à moustache à partir d'un échantillon aléatoire du jeu de données d'apprentissage. Il est visible en figure \ref{fig:box-plot-train} un exemple du résultat pour une caractéristique. 
         \begin{figure}[h]
-            \includegraphics[width=\linewidth]{images/universe.jpg}
-            \caption{Boîte à moustache du feature FEATURE A INDIQUER sur un échantillon aléatoire de l'ensemble du jeu de données d'apprentissage}
+            \centering
+            \includegraphics[scale=0.50]{images/all_26.png}
+            \caption{Boîte à moustache du feature 26 A INDIQUER sur un échantillon aléatoire de l'ensemble du jeu de données d'apprentissage}
             \label{fig:box-plot-train}
         \end{figure}
         Puis, les mêmes statistiques descriptives peuvent être effectuées sur les batchs seuls. En l'occurence, je me suis intéressé ici aux batchs $70$ et $115$. L'idée est d'essayer de déceler des \emph{outliers}. Un \emph{outlier} est un échantillon d'un jeu de donnée qui s'éloigne de la distribution des autres observations. Ainsi comme on peut le voir sur la figure \ref{fig:box-plot-train-115}, on observe des points s'éloignant de la distribution observée en figure \ref{fig:box-plot-train}.
          \begin{figure}[h]
-            \includegraphics[width=\linewidth]{images/universe.jpg}
-            \caption{Boîte à moustache du feature FEATURE A INDIQUER sur le batch 115}
+            \centering
+            \includegraphics[scale=0.50]{images/115_26.png}
+            \caption{Boîte à moustache du feature 26 sur le batch 115}
             \label{fig:box-plot-train-115}
         \end{figure}
-        Il semble donc que ou ou plusieurs \emph{outliers} aient pu causer cette chute de performance du modèle lors de l'apprentissage en ligne. Afin de confirmer, cette hypothèse, il faudrait relancer un apprentissage identique, en enlevant ces fameux \emph{outliers} et observer la courbe d'apprentissage résultante de cette opération. Pour trouver ces derniers, il faut trouver les points dont la distance est la plus élevée avec la valeur moyenne. En haute dimension, une distance recommandée est la distance de \textbf{Mahalanobis}\footnote{\url{https://en.wikipedia.org/wiki/Mahalanobis_distance}}. La démarche est ensuite la suivante. On prélève un échantillon aléatoire d'exemples issus de l'ensemble des données d'apprentissage, puis, pour les \emph{batch} (en l'occurence les \emph{batchs} $70$ $115$) dans lesquels on veut s'assurer que les \emph{outliers}  ne pénalisent pas le modèle , on va calculer une distance de Mahalanobis par rapport au vecteur moyen exprimé calculé. Puis, j'ai défini un seuil, ici 10\%, au delà duquel je considère le point comme un \emph{outlier} si la distance par rapport au vecteur moyen dépasse ce seuil. Il reste maintenant à relancer l'apprentissage. Comme on peut le voir sur la figure \ref{fig:exp_outliers_last}, le tri des \emph{outliers} confirme que ces derniers sont sources de perturbation dans l'apprentissage. 
+        Il semble donc que ou ou plusieurs \emph{outliers} aient pu causer cette chute de performance du modèle lors de l'apprentissage en ligne. En effet, on se rend par exemple compte que la répartition globale des exemples positifs est très différente de celle du \emph{batch} $115$ qui ne contient aucun exemple au delà de la valeur $7$ au contraire de l'ensemble des données.Afin de confirmer, cette hypothèse, il faudrait relancer un apprentissage identique, en enlevant ces fameux \emph{outliers} et observer la courbe d'apprentissage résultante de cette opération. Pour trouver ces derniers, il faut trouver les points dont la distance est la plus élevée avec la valeur moyenne. En haute dimension, une distance recommandée est la distance de \textbf{Mahalanobis}\footnote{\url{https://en.wikipedia.org/wiki/Mahalanobis_distance}}. La démarche est ensuite la suivante. On prélève un échantillon aléatoire d'exemples issus de l'ensemble des données d'apprentissage, puis, pour les \emph{batch} (en l'occurence les \emph{batchs} $70$ $115$) dans lesquels on veut s'assurer que les \emph{outliers}  ne pénalisent pas le modèle , on va calculer une distance de Mahalanobis par rapport au vecteur moyen exprimé calculé. Puis, j'ai défini un seuil, ici 10\%, au delà duquel je considère le point comme un \emph{outlier} si la distance par rapport au vecteur moyen dépasse ce seuil. Il reste maintenant à relancer l'apprentissage. Comme on peut le voir sur la figure \ref{fig:exp_outliers_last}, le tri des \emph{outliers} confirme que ces derniers sont sources de perturbation dans l'apprentissage. 
         \begin{figure}[h]
             \label{fig:exp_outliers_last}
             \centering
@@ -132,12 +134,20 @@ L'apprentissage d'un modèle consiste en une succession d'exécutions de scripts
         \end{figure}
         On observe, comme lors de l'expérience précédente que la métrique de test à savoir dans notre cas l'\textbf{AUC}. Cependant, à la différence de avec le jeu de données \textbf{HIGGS}, il semble au premier abord que le coût ne suit pas une trajectoire standard. Il ne faut cependant pas oublier la nature de notre problème, où les exemples positifs ont une probabilité d'occurrence de l'ordre de $10^-4$. Dans ces cas extrême, le coût d'apprentissage est très souvent très bas dès le départ. \par
         Après s'être assuré de la fiabilité de \emph{Vowpal Wabbit} pour notre cas d'utilisation il a donc fallu l'intégrer à la version existante de \textbf{DTLR-LR}. La première étape de l'intégration à la version existante du \bo \textbf{DTLR-LR} a été la modification du fichier de configuration permettant de paraméter l'apprentissage. En effet, en plus d'offrir la possibilité de choisir entre un modèle \textbf{DTLR} et un modèle \textbf{LR}, le fichier de configuration devait offrir la possibilité d'effectuer l'apprentissage \emph{en batch} ou \emph{en ligne}. De plus, il a fallu adapter le code existant pour s'assurer de la sauvegarde du modèle dans un format qui permette la reprise de l'apprentissage tout en permettant l'inférence. Cela est passé par la mise à jour du \emph{pipeline} d'apprentissage ainsi que de la modification du code \emph{Scala} \par
-        Suite à l'implémentation de la solution est intervenue l'étape de suivi en production. Quelques semaines après la mise en production, nous avons eu l'opportunité de tester cette nouvelle version du \bo par l'intermédiaire d'une campagne de \emph{pré-targeting} d'un de nos clients/ \emph{Primagaz}. Comme il est visible sur la figure \ref{fig:primagaz}, on peut associer une vraie amélioration du taux de clicks sur la campagne suite au branchement du \bo sur la campagne.
+        Suite à l'implémentation de la solution est intervenue l'étape de suivi en production. Quelques semaines après la mise en production, nous avons eu l'opportunité de tester cette nouvelle version du \bo par l'intermédiaire d'une campagne de \emph{pré-targeting} d'un de nos clients/ \emph{Primagaz}. Comme il est visible sur la figure \ref{fig:primagaz}, on peut associer une vraie amélioration du taux de cliques sur la campagne suite au branchement du \bo sur la campagne.
         \begin{figure}[h]
-            \includegraphics[width=\linewidth]{images/universe.jpg}
+            \includegraphics[width=\linewidth]{images/screen_campaign_primagaz.png}
             \caption{Comparaison des résultats d'une campagne publicitaire avant et après branchement du bid optimizer ONLINE}
             \label{fig:primagaz}
         \end{figure}
+        En effet, le branchement de ce \bo sur cette campagne a été effectué le 5 juin. Au 20 juillet les améliorations suivantes étaient constatées:
+        \begin{itemize}
+            \item Augmentation de 132\% des impressions
+            \item Augmentation de 158\% des cliques
+            \item Augmentation de 20\% du taux de cliques
+            \item Diminuation de 60\% du \textbf{CPM}\footnote{Le CPM (Cost per "mille") est le prix d'achat de 1000 impressions}
+            \item Diminution de 72\% du \textbf{CPC}\footnote{Le CPC (Cost per Click) correspond au retour sur investissement du click, c'est à dire le nombre d'impressions qu'il faut effectuer pour obtenir un clique et donc le facturer. C'est ce que l'on cherche à minimiser en optimisant le \textbf{CTR}}
+        \end{itemize}
         %Je ne rentrerai pas dans les détails de l'implémentation mais je veux néanmoins revenir sur deux difficultés que j'ai rencontré lors de cette implémentation. La première difficulté est celle de la gestion du \emph{feature hashing}\footnote{\url{https://en.wikipedia.org/wiki/Feature_hashing}}. En effet, lorsque l'on apprend un modèle avec nos données, on ne connaît pas par avance tous les \emph{features}. Par exemple
         Dans la dernière partie de cette section, je vais revenir sur les objectifs initiaux du \bo online en terme d'amélioration et conclure si les critères sont bien respectés. De plus, j'aborderai les aspects qui n'ont pas été abordés ou pris en compte par mon implémentation.
        
@@ -147,7 +157,9 @@ L'apprentissage d'un modèle consiste en une succession d'exécutions de scripts
         % Problème avec le hashing des features. Car le modèle d'inférence est créé programatiquement en scala cf plugin-dtlr -> nécessiter de stocker les features ainsi que leurs hash.
         % Comparaison des résultats avec DLTR et LR HS 
     \subsection{Critique et pistes d'évolution}
-        
+        L'objectif initial du développement d'un \bo en ligne était la possibilité d'apprendre des modèles de manière plus simple et rapide qu'avec la version initiale de \textbf{DTLR-LR} tout cela sans régression en terme de performances. Au regard des résultats présentés, ce cahier des charges est respecté. En lançant un apprentissage sur plusieurs journées de données un apprentissage peut prendre plusieurs heures avec la version initiale du \emph{plugin}. Dorénavant, mis à part lors du premier apprentissage, le \bo apprends seulement sur les nouvelles données qu'il n'a jamais rencontré, ce qui permet de restreindre le temps d'apprentissage à quelques secondes seulement. \par
+        Néanmoins, d'autres axes de réflexion autour de l'optimisation en ligne restent à explorer. L'apprentissage d'un modèle de machine learning, nécessite en général la mise en place de techniques de régularisation pour éviter le sur-apprentissage. Cette problématique est toujours un sujet chaud sur lesquelles une réflexion en équipe a été effectuée. Des pistes existent comme proposé en \cite{do2009proximal} et \cite{mcmahan2013ad} avec la \textbf{Progressive Validation}. Une idée également est de profiter de la rapidité d'apprentissage des modèles en ligne pour exécuter des apprentissages simultanés avec des jeux d'hyper-paramètres différents. Puis, à l'instant $t$ de choisir le modèle qui offre les meilleurs performances. \par
+        En plus de l'implémentation d'un régression logistique en ligne, mon stage a également été l'occasion d'aborder de nouveaux algorithmes de \emph{machine learning} et d'effectuer un état de l'art des méthodes d'optimisation d'enchères existantes. C'est ce point que j'aborderai dans la partie suivante de ce rapport.
         % Réflexion sur la régularisation 
             % Objectif, optimisation en ligne, performances comparables avec apprentissage rapide ok.
             % On y a réfléchi mais pas de solutions satisfaisantes encore trouvée / implémentée
@@ -156,23 +168,57 @@ L'apprentissage d'un modèle consiste en une succession d'exécutions de scripts
             % Validation en ligne ? 
     
 \section{Recherche de nouveaux modèles d'optimisation d'enchères}
+    Dans cette partie, je vais aborder mes recherches concernant l'état de l'art de l'optimisation d'enchère. 
     % Nouvelles approches algos pour faire de l'optimisation de bid % Objectifs 5 pages.
     \subsection{Veille technologique}
-    % Kaggle -> FFM
-    % Revue de l'article de google
+    
+    En 2013, \emph{Google} a sorti un papier \cite{mcmahan2013ad} sur les enseignements de l'optimisation de cliques. Ce papier introduit un ensemble de bonnes pratiques sur les performances des modèles, leur taille, les temps d'apprentissage etc... Je vais cependant me consacrer sur les enseignements concernant l'amélioration des performances pures du modèle. Le papier indique que la \textbf{Truncated Gradient Descent} dont nous avons largement parlé précedemment est une méthode efficate pour induire de la sparsité au modèle, mais que néanmoins d'autres méthodes de centrée sur le gradient permettent d'obtenir en général une meilleure précision. Selon leurs expériences, l'algorithme \fg Follow the (Proximally) Regularized Leader\og, \textbf{FTRL-Proximal} tout en induisant de la \emph{sparsité} \cite{mcmahan2011follow}. Cette papier par H. \textsc{Brendan McMahan} prouve que la plupart des algorithmes d'optimisation convexe telle que la descente de gradient en ligne peuvent s'exprimer sur la forme d'algorithmes \textbf{FTRL}. Sans rentrer dans les détails, cette catégorie d'algorithmes va chercher à utiliser le \emph{regret}. Pour faire simple, le regret est le calcul de l'écart entre le score que le modèle produit à l'itération $t$ et le score qu'il aurait pu produire si les poids avaient été fixés à l'itération actuelle. Il s'exprime plus clairement par la formule suivante: 
+    \[
+        Regret = \sum_{t} f_{t}(w_{t}) - \min_{w \in W} \sum_{t} f_{t}(w)
+    \]
+    \textsc{MaMahan} par l'intermédiaire d'un cours\footnote{https://courses.cs.washington.edu/courses/cse599s/14sp/scribes/lecture2/scribeNote.pdf} à l'université de Washington revient sur cette approche. \newline
+    Néanmoins le papier de \emph{Google} revient également sur des résultats moins satisfaisants. Deux ont particulièrement attiré mon attention. Le premier est la réduction de l'espace du \emph{feature hashing}\footnote{\url{https://en.wikipedia.org/wiki/Feature_hashing}}. Le \emph{Hashing Trick} consiste à créer une table de hachâge de $N$ hashs correspondant à $N$ features. Cela est particulièrement utile lorsque l'on ne connaît pas par avance l'ensemble de nos \emph{paramètres} à représenter ou bien que la cardinalité de notre espace de \emph{features} est trop élevée. Par exemple, dans notre cas l'id d'un site web est un \emph{feature} catégoriel. Si l'on voulait représenter ce feature par la méthode du \textbf{One-Hot Encoding}, il faudrait allouer un \emph{feature} pour l'ensemble des sites webs d'internet. En plus d'occuper un énorme espace mémoire cela nécessiterait de connaître en amont l'intégralité des sites webs. Requérir au \emph{hashing trick} dans cet situation est donc ici la meilleure solution puisqu'il nous permet de représenter un vaste espace de \emph{features} inconnus. \emph{Google} explique donc qu'en essayant de réduire au maximum la cardinalité du hachage cela n'a pas amélioré les performances de leur modèle. \newline
+    Un dernier enseignement de ce papier est la tentative d'utilisation de la méthode de régularisation du \textbf{Dropout} \cite{tinto1975dropout}, très en vogue pour l'apprentissage des réseaux de neurones. Cependant cette méthode de régularisation n'a pas porté ses fruits en n'apportant aucun gain en précision. Selon eux, l'explication derrière est la différence des distributions des caractéristiques de la donnée sparse. En effet, le \text{dropout} a démontré de belles performances dans l'optimisation de réseaux de neurones dont les applications sont principalement issues de données dense telle que les problémes de vision. \par
+    
+    Récemment, sur la plateforme de compétitions de data science \emph{Kaggle}\footnote{\url{https://www.kaggle.com/}}, un algorithme est devenu assez populaire et a offert d'excellentes performances notamment par le biais de la compétition de \emph{Criteo} \fg Display Advertising Challenge \og \footnote{\url{https://www.kaggle.com/c/criteo-display-ad-challenge}} qu'elle a gagnée. Cette compétition était organisé par \emph{Criteo}, qui est un des leader mondiaux du \emph{digital marketing} et avait pour objectif la prédicion de  cliques ce qui est exactement notre cas d'utilisation. Cet algorithme est \textbf{FFM} \cite{juan2016field}. \par
+    
+    \textbf{PARAGRAPHE SUR CATBOOST}
+    
+    
     % Catboost -> Choix à tester
-    % Feature engineering avec les outils développés par tensorflow
+    % Feature engineering avec les outils développés par tensorflow -> déplacer dans la troisième partie
     \subsection{Implémentation de la solution}
+        \textbf{TESTS SUR FTLR RAPIDES AVEC VOWPAL WABBIT SANS AMËLIORATION DES RÉSULTATS} \par
+        \textbf{TESTS SUR CATBOOST} \par 
+        \textbf{PAS DE TESTS SUR FFM à ce jour}
         % Performance intéressante mais immaturité de la solution. En terme d'export et de lisibilité du modèle
         % Impossible à utiliser en l'état, mais piste intéressante de solution.
     \subsection{Critique et pistes d'évolution}
+        \textbf{FTRL NE MONTRE PAS AMÉLIORATION MAJEURE DES RÉSULTATS} \par
+        \textbf{CATBOOST INTÉRESSANT MAIS IMMATURITÉ DE LA SOLUTION EN TERME DE VISUALISATION DE L'IMPORTANCE DES FEATURES ET D'EXPORT DU MODÈLE}
         
     
 \section{Amélioration de la modularité et maintenabilité de DTLR/LR}
+    \textbf{COMME EXPLICITÉ PLUS HAUT VOLONTÉ DE SE DÉTACHER AU MAXIMUM DES LIBRAIRIES TIERCES QUI SONT PARFOIS MAL MAINTENUES ET QUI DEMANDE UN EFFORT SUPPLÉMENTAIRE POUR LES MONTÉES EN VERSION RÉGULIÈRES + PROBLÈMES INITIAUX DE CONCEPTION DE L'APPRENTISSAGE DES MODÈLES DTLR-LR --> TENTATIVE POUR REFACTORER L'APPRENTISSAGE OU CHANGER COMPLÈTEMENT LE PROCESSUS DE CE DERNIER PAR L'UTILISATION DE LIBRAIRIES PYTHON}
     % All the shit about nak / breeze / stuff pour implémenter une descente de gradient soit même avec scala
     \subsection{Veille technologique}
+        \subsubsection{L'ecosysteme Scala}
+            \begin{itemize}
+                \item spark
+                \item breeze / nak
+                \item tensorflow\_scala
+            \end{itemize}
+        \subsubsection{ecosystème python}
+            \textbf{TENSORFLOW}
     \subsection{Implémentation de la solution}
+        \textbf{TENTATIVES D'IMPLEMENTATION INFRUCTUEUSES EN SCALA: RENTRER DANS LE DÉTAILS DES MANQUES} \par
+        \textbf{MODULARITÉ DE LA SOLUTION TRÈS INTÉRESSANTE POUR TENSORFLOW EN PLUS D'OFFRIR DES OUTILS DE VISUALISATION INTÉGRÉS MAIS PROBLÉMATIQUE DE MISE EN PRODUCTION AU SEIN DE L'ARCHITECTURE MÉDIARITHMICS}
     \subsection{Critique et pistes d'évolution}
 
-\subsection{Trouver un nom à cette partie}
+\subsection{Retour et réflexion autour des bids optimizers chez mediarithmics}
+    \subsubsection{Réflexion autour d'une meilleure métrique d'évaluation des modèles}
+    \subsubsection{Conception d'un jeu de données standardisé}
+    \subsubsection{Campagnes mutualisées}
+    \subsubsection{Logique métier}
+
     % Ce qu'il reste à faire, conclusion plus générale sur les difficultés de ce projet, plus idées d'amélioration et travail en cours comme la réflexion autour d'une métriqué d'évaluation des bids optimizers chez mediarithmics plus pertinente ou encore la conception d'un jeu de test standardisé répondant aux besoins d'un modèle online mais également sur les réfléxions autour des nouveaux bids optimizers chez mediarithmics avec données de campagnes mutualisées par exemple.
